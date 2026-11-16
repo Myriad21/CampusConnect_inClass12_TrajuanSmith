@@ -41,6 +41,20 @@ function customMessage(field) {
 
     }
   // campusEmail: require exactly the domain student.gsu.edu after @.
+
+    if (field.id === "campusEmail") {
+        const email = field.value.trim();
+
+        if (email === "") {
+            return "Please enter your campus email address.";
+        }
+
+        if (!/^[^\s@]+@student\.gsu\.edu$/i.test(email)) {
+            return "Enter a valid campus email ending in @student.gsu.edu.";
+        }
+    }
+
+    // campusID val
   // password: 8+ characters, upper, lower, digit, and a non-whitespace symbol.
   // confirm: compare against password.value without trimming either password.
   // interests: selectedOptions.length must be 1-3.
