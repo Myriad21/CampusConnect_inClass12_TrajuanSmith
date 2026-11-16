@@ -1,5 +1,4 @@
 # CampusConnect_inClass12_TrajuanSmith
-# CampusConnect — The Accessible Registration Suite
 
 CampusConnect is a four-step registration form built using HTML, CSS, and JavaScript to demonstrate accessible client-side validation. The Identity step validates the user's full name, campus email address, and fictional student ID using HTML constraints and custom JavaScript rules. The Security step enforces password complexity requirements, provides a live password checklist, and checks that the confirmation password matches exactly. The Profile step validates membership tier selection, limits interests to one through three choices, enforces a 140-character biography limit, and requires acceptance of the terms. The Review step displays a summary of the entered information without exposing the user's password and allows users to return to earlier steps to make changes.
 
