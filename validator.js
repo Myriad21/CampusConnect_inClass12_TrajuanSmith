@@ -67,8 +67,31 @@ function customMessage(field) {
         }
     }
   // password: 8+ characters, upper, lower, digit, and a non-whitespace symbol.
-  
+    if (field.id === "password") {
+        const password = field.value;
+
+        if (password.length < 8) {
+            return "Password must contain at least 8 characters.";
+        }
+
+        if (!/[A-Z]/.test(password)) {
+            return "Password must contain at least one uppercase letter.";
+        }
+
+        if (!/[a-z]/.test(password)) {
+            return "Password must contain at least one lowercase letter.";
+        }
+
+        if (!/[0-9]/.test(password)) {
+            return "Password must contain at least one digit.";
+        }
+
+        if (!/[^A-Za-z0-9\s]/.test(password)) {
+            return "Password must contain at least one symbol.";
+        }
+    }
   // confirm: compare against password.value without trimming either password.
+  
   // interests: selectedOptions.length must be 1-3.
   // bio: explicitly reject value.length > 140, including programmatically set values.
 
