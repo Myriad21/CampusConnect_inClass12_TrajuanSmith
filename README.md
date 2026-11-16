@@ -1,5 +1,21 @@
-# CampusConnect_inClass12_TrajuanSmith
+# CampusConnect — The Accessible Registration Suite
 
-CampusConnect is a four-step registration form built using HTML, CSS, and JavaScript to demonstrate accessible client-side validation. The Identity step validates the user's full name, campus email address, and fictional student ID using HTML constraints and custom JavaScript rules. The Security step enforces password complexity requirements, provides a live password checklist, and checks that the confirmation password matches exactly. The Profile step validates membership tier selection, limits interests to one through three choices, enforces a 140-character biography limit, and requires acceptance of the terms. The Review step displays a summary of the entered information without exposing the user's password and allows users to return to earlier steps to make changes.
+CampusConnect is a four-step student club registration form developed using HTML, CSS, and JavaScript to demonstrate accessible client-side form validation.
 
-The JavaScript validation system uses reusable functions such as `customMessage()`, `checkField()`, and `showErrors()` to separate validation rules from error presentation. Validation occurs when fields lose focus, when previously invalid entries are corrected, when selection controls change, and when users attempt to advance or submit the form. Accessibility features include associated labels, ARIA attributes, keyboard navigation, linked error summaries, and focus management. One design tradeoff was using custom JavaScript validation alongside native HTML constraints, which requires additional code but provides more specific feedback and better control over the multi-step experience. This project is a demonstration only; no registration information is transmitted to a server or stored persistently.
+The application can be run by opening `index.html` in a modern web browser with JavaScript enabled, provided that `style.css` and `validator.js` remain in the same folder.
+
+The registration process consists of Identity, Security, Profile, and Review steps, allowing users to enter information, correct errors, and review their entries before completing the demonstration.
+
+The project applies HTML constraint validation alongside JavaScript validation patterns, including `blur`, `input`, and `change` event listeners, custom validation messages, and final submission checks.
+
+Reusable functions such as `customMessage()`, `checkField()`, and `showErrors()` manage validation rules and error feedback across the registration steps.
+
+Accessibility features include associated labels, keyboard navigation, ARIA attributes, linked error summaries, and error messages that do not rely exclusively on color.
+
+One design decision was to preserve entered information when users navigate backward by hiding and displaying existing form sections rather than rebuilding them.
+
+A tradeoff of combining native HTML constraints with custom JavaScript validation is the additional implementation complexity required to provide consistent messages and control validation timing.
+
+The application is a client-side demonstration and does not transmit registration information, create user accounts, or store submitted records on a server.
+
+Known limitations include requiring JavaScript for multi-step navigation, losing entered information when the page is reloaded, and lacking authoritative server-side validation.

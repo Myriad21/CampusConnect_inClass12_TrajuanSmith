@@ -1,23 +1,22 @@
 # CampusConnect — Validation Map
 
-| Field | Validation Rules | HTML Enforcement | JavaScript Enforcement |
+| Field | Rule | HTML / JS / Both | Event / Stage |
 |---|---|---|---|
-| Full Name | Required; at least one letter; only letters, spaces, hyphens, and apostrophes | `required`, `pattern` | `customMessage()` checks empty input, letter requirement, and allowed characters |
-| Campus Email | Required; valid email format; exact `student.gsu.edu` domain (case-insensitive) | `type="email"`, `required` | `customMessage()` checks the required domain using a regular expression |
-| Student ID | Required; exactly 9 digits; first digit 1–9 | `required`, `pattern` | `customMessage()` verifies the nine-digit format |
-| Password | Required; at least 8 characters; uppercase, lowercase, digit, and symbol | `type="password"`, `required`, `minlength="8"` | `customMessage()` enforces complexity; `updatePasswordChecklist()` displays live feedback |
-| Confirm Password | Required; must match password exactly | `type="password"`, `required` | `customMessage()` compares both password values without trimming |
-| Membership Tier | One selection required: Basic ($25), Standard ($50), or Deluxe ($100) | Radio group; `required` | `checkField()` validates the radio group together |
-| Interests | At least 1 and no more than 3 selections | `<select multiple required>` | `customMessage()` checks `selectedOptions.length` |
-| Biography | Optional; maximum 140 characters | `maxlength="140"` | `customMessage()` checks length; `input` listener updates the character counter |
-| Terms Acceptance | Must be checked before continuing | `type="checkbox"`, `required` | `customMessage()` checks whether the checkbox is selected |
+| Full Name | Required; at least one letter; only A–Z, a–z, spaces, hyphens, and apostrophes | Both: `required`, `pattern`, `customMessage()` | Blur; input correction; Identity Next; final submit |
+| Campus Email | Required; valid email format; exact `student.gsu.edu` domain, case-insensitive | Both: `type="email"`, `required`, `customMessage()` | Blur; input correction; Identity Next; final submit |
+| Student ID | Required; exactly 9 digits; first digit 1–9 | Both: `required`, `pattern`, `customMessage()` | Blur; input correction; Identity Next; final submit |
+| Password | Required; 8+ characters; uppercase, lowercase, digit, and non-whitespace symbol | Both: `required`, `minlength`, `customMessage()` | Blur; live checklist on input; Security Next; final submit |
+| Confirm Password | Required; exact match with password, without trimming | Both: `required`, `customMessage()` | Blur; input correction; password changes; Security Next; final submit |
+| Membership Tier | One selection: Basic ($25), Standard ($50), or Deluxe ($100) | Both: required radio group; `checkField()` | Change; Profile Review; final submit |
+| Interests | Select at least 1 and no more than 3 interests | Both: `required` multi-select; `customMessage()` | Change; Profile Review; final submit |
+| Biography | Optional; maximum 140 characters | Both: `maxlength="140"`; `customMessage()` | Input counter; blur; Profile Review; final submit |
+| Terms Acceptance | Checkbox must be checked | Both: `required`; `customMessage()` | Change; Profile Review; final submit |
 
-## Validation Timing and Accessibility
+## Validation and Accessibility Notes
 
-- **On blur:** Fields are validated when users leave them.
-- **On input:** Previously invalid fields are rechecked while users correct them.
-- **On change:** Radio buttons, checkboxes, and the interests selector are revalidated.
-- **On Next/Review:** All fields in the current step are validated before advancing.
-- **On Submit:** Every form field is revalidated, including fields in earlier steps.
-- **Error feedback:** `aria-invalid`, `aria-describedby`, field-level messages, and a linked error summary communicate validation problems.
-- **Focus management:** Failed navigation moves focus to the error summary; correcting fields updates the summary without stealing focus.
+- **Field validation:** `checkField()` applies custom rules and native HTML constraints.
+- **Error feedback:** Invalid fields receive `aria-invalid="true"` and associated error messages through `aria-describedby`.
+- **Error summary:** `showErrors()` creates linked messages that navigate to affected fields.
+- **Navigation:** Next and Review validate the current step; Back preserves existing entries.
+- **Final validation:** Submit rechecks all registration fields, including those in earlier steps.
+- **Security:** Password values are never displayed in the Review summary or stored persistently.
