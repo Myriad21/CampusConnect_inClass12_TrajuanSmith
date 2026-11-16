@@ -54,8 +54,20 @@ function customMessage(field) {
         }
     }
 
-    // campusID val
+    // campusID validation
+    if (field.id === "studentId") {
+        const studentId = field.value;
+
+        if (studentId === "") {
+            return "Please enter your fictional student ID.";
+        }
+
+        if (!/^[1-9][0-9]{8}$/.test(studentId)) {
+            return "Student ID must contain exactly 9 digits and cannot start with zero.";
+        }
+    }
   // password: 8+ characters, upper, lower, digit, and a non-whitespace symbol.
+  
   // confirm: compare against password.value without trimming either password.
   // interests: selectedOptions.length must be 1-3.
   // bio: explicitly reject value.length > 140, including programmatically set values.
