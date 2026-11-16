@@ -183,13 +183,52 @@ fields.forEach(function (field) {
   field.addEventListener("input", function () {
     status.textContent = "";
     if (field.getAttribute("aria-invalid") === "true") checkField(field);
+   
     // TODO: recheck confirmation if password changes after confirmation was entered.
+
+    if (field.id === "password") {
+        const confirmField = document.querySelector("#confirm");
+
+        if (confirmField.value !== "") {
+            checkField(confirmField);
+        }
+    }
   });
 });
 document.querySelector("#bio").addEventListener("input", function (event) {
   document.querySelector("#bioCount").textContent = 140 - event.target.value.length;
 });
 // TODO: update each #pwRules item on password input; show "Met" / "Needed" text.
+const passwordInput = document.querySelector("#password");
+
+function updatePasswordChecklist() {
+    const password = passwordInput.value;
+
+    const rules = {
+        len: password.length >= 8,
+        upper: /[A-Z]/.test(password),
+        lower: /[a-z]/.test(password),
+        digit: /[0-9]/.test(password),
+        symbol: /[^A-Za-z0-9\s]/.test(password)
+    };
+
+    document.querySelectorAll("#pwRules li").forEach(function (item) {
+        const rule = item.dataset.rule;
+        const met = rules[rule];
+
+        item.classList.toggle("met", met);
+        item.classList.toggle("needed", !met);
+
+        const label = item.dataset.label || item.textContent;
+        item.dataset.label = label;
+
+        item.textContent = label + " — " + (met ? "Met" : "Needed");
+    });
+}
+
+passwordInput.addEventListener("input", updatePasswordChecklist);
+
+updatePasswordChecklist();
 
 form.addEventListener("submit", function (event) {
   event.preventDefault();
