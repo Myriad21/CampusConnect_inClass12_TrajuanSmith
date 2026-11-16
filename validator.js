@@ -103,8 +103,34 @@ function customMessage(field) {
             return "Passwords do not match.";
         }
     }
-  // interests: selectedOptions.length must be 1-3.
+
+    // interests: selectedOptions.length must be 1-3.
+    if (field.id === "interests") {
+        const selectedCount = field.selectedOptions.length;
+
+        if (selectedCount < 1) {
+            return "Please select at least one interest.";
+        }
+
+        if (selectedCount > 3) {
+            return "You may select no more than three interests.";
+        }
+    }
+
   // bio: explicitly reject value.length > 140, including programmatically set values.
+    if (field.id === "bio") {
+        const bio = field.value;
+
+        if (bio.length > 140) {
+            return "Bio must not exceed 140 characters.";
+        }
+    }
+
+    if (field.id === "terms") {
+        if (!field.checked) {
+            return "You must accept the terms before continuing.";
+        }
+    }
 
     
   return "";
