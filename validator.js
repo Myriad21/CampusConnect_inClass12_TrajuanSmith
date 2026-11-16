@@ -91,7 +91,18 @@ function customMessage(field) {
         }
     }
   // confirm: compare against password.value without trimming either password.
-  
+    if (field.id === "confirm") {
+        const password = document.querySelector("#password").value;
+        const confirm = field.value;
+
+        if (confirm === "") {
+            return "Please confirm your password.";
+        }
+
+        if (confirm !== password) {
+            return "Passwords do not match.";
+        }
+    }
   // interests: selectedOptions.length must be 1-3.
   // bio: explicitly reject value.length > 140, including programmatically set values.
 
