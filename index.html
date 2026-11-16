@@ -9,7 +9,10 @@
 <body>
 
 <h1>CampusConnect registration</h1>
-<p>Starter: finish all TODOs before submission. Use fictional data only.</p>
+<p>
+    Complete the four registration steps using fictional information.
+    This demonstration validates your entries without submitting or storing your data.
+</p>
 <div id="error-summary" tabindex="-1" hidden></div>
 
 <p class="progress" role="status">Step <span id="stepNum">1</span> of 4</p>
@@ -57,11 +60,14 @@
   <!-- STEP 3: PROFILE (tier radio, interests multi-select, bio) -->
   <section class="step" data-step="3">
     <h2 tabindex="-1">Profile</h2>
-    <fieldset><legend>Tier (required)</legend>
+    <fieldset aria-describedby="tier_err">
+    <legend>Tier (required)</legend>
     <label><input type="radio" name="tier" value="basic" required> Basic ($25)</label>
     <label><input type="radio" name="tier" value="standard" checked> Standard ($50)</label>
     <label><input type="radio" name="tier" value="deluxe"> Deluxe ($100)</label>
     </fieldset>
+
+    <div class="field-error" id="tier_err" aria-live="polite"></div>
 
     <label for="interests">Interests (1–3, required)</label>
     <select id="interests" name="interests[]" multiple size="4" required>

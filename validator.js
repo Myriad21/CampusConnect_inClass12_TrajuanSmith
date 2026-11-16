@@ -137,12 +137,39 @@ function customMessage(field) {
 }
 
 function checkField(field) {
-  field.setCustomValidity("");
-  field.setCustomValidity(customMessage(field));
-  const valid = field.checkValidity();
-  document.getElementById(field.id + "_err").textContent = valid ? "" : field.validationMessage;
-  field.setAttribute("aria-invalid", String(!valid));
-  return valid;
+    if (field.type === "radio" && field.name === "tier") {
+        const tierFields = form.querySelectorAll('input[name="tier"]');
+        const selectedTier = form.querySelector('input[name="tier"]:checked');
+        const valid = selectedTier !== null;
+
+        tierFields.forEach(function (radio) {
+            radio.setCustomValidity("");
+            radio.setAttribute("aria-invalid", String(!valid));
+
+            const error = document.getElementById(radio.id + "_err");
+            error.textContent = "";
+        });
+
+        const groupError = document.querySelector("#tier_err");
+
+        groupError.textContent = valid
+            ? ""
+            : "Please select a membership tier.";
+
+        return valid;
+    }
+
+    field.setCustomValidity("");
+    field.setCustomValidity(customMessage(field));
+
+    const valid = field.checkValidity();
+
+    document.getElementById(field.id + "_err").textContent =
+        valid ? "" : field.validationMessage;
+
+    field.setAttribute("aria-invalid", String(!valid));
+
+    return valid;
 }
 
 function showStep(index) {
@@ -153,16 +180,30 @@ function showStep(index) {
   sections[index].querySelector("h2").focus();
 }
 
-function showErrors(invalid) {
+function showErrors(invalid, moveFocus = true) {
   summary.replaceChildren();
   const heading = document.createElement("h2");
   heading.textContent = "Please correct these fields";
   const list = document.createElement("ul");
+  const reportedGroups = new Set();
   invalid.forEach(function (field) {
+    if (field.type === "radio" && field.name === "tier") {
+        if (reportedGroups.has("tier")) {
+            return;
+        }
+
+        reportedGroups.add("tier");
+    }
     const item = document.createElement("li");
     const link = document.createElement("a");
     link.href = "#" + field.id;
-    link.textContent = field.name + ": " + field.validationMessage;
+
+    if (field.type === "radio" && field.name === "tier") {
+        link.textContent = "Membership tier: Please select a membership tier.";
+    } else {
+        link.textContent = field.name + ": " + field.validationMessage;
+    }
+
     link.addEventListener("click", function (event) {
       event.preventDefault();
       showStep(sections.indexOf(field.closest(".step")));
@@ -171,25 +212,103 @@ function showErrors(invalid) {
     item.appendChild(link);
     list.appendChild(item);
   });
-  summary.append(heading, list);
-  summary.hidden = false;
-  summary.focus();
+    summary.append(heading, list);
+    summary.hidden = false;
+
+    if (moveFocus) {
+        summary.focus();
+    }
+}
+
+function updateErrorSummary() {
+    if (summary.hidden) {
+        return;
+    }
+
+    const invalid = fields.filter(function (field) {
+        return field.getAttribute("aria-invalid") === "true";
+    });
+
+    if (invalid.length === 0) {
+        summary.hidden = true;
+        summary.replaceChildren();
+        return;
+    }
+
+    showErrors(invalid, false);
 }
 
 function buildReview() {
-  const review = document.querySelector("#reviewSummary");
-  review.replaceChildren();
-  // TODO: add a safe summary of each non-secret value using textContent.
-  const note = document.createElement("p");
-  note.textContent = "TODO: complete the non-secret review summary. Passwords must not be shown.";
-  review.appendChild(note);
-  ["Identity", "Security", "Profile"].forEach(function (title, index) {
-    const edit = document.createElement("button");
-    edit.type = "button";
-    edit.textContent = "Edit " + title;
-    edit.addEventListener("click", function () { showStep(index); });
-    review.appendChild(edit);
-  });
+    const review = document.querySelector("#reviewSummary");
+    review.replaceChildren();
+
+    function addReviewItem(label, value) {
+        const paragraph = document.createElement("p");
+
+        const strong = document.createElement("strong");
+        strong.textContent = label + ": ";
+
+        const span = document.createElement("span");
+        span.textContent = value;
+
+        paragraph.append(strong, span);
+        review.appendChild(paragraph);
+    }
+
+    // Identity
+    addReviewItem("Full name", document.querySelector("#fullname").value);
+    addReviewItem("Campus email", document.querySelector("#campusEmail").value);
+    addReviewItem("Student ID", document.querySelector("#studentId").value);
+
+    // Security: never display the actual password
+    const password = document.querySelector("#password").value;
+    addReviewItem("Password", password ? "Set" : "Not set");
+
+    // Profile
+    const selectedTier = document.querySelector('input[name="tier"]:checked');
+
+    const tierPrices = {
+        basic: "$25",
+        standard: "$50",
+        deluxe: "$100"
+    };
+
+    if (selectedTier) {
+        const tier = selectedTier.value;
+        addReviewItem(
+            "Membership tier",
+            tier.charAt(0).toUpperCase() + tier.slice(1) +
+            " (" + tierPrices[tier] + ")"
+        );
+    }
+
+    const interests = Array.from(
+        document.querySelector("#interests").selectedOptions
+    ).map(function (option) {
+        return option.textContent;
+    });
+
+    addReviewItem("Interests", interests.join(", "));
+
+    const bio = document.querySelector("#bio").value;
+    addReviewItem("Bio", bio || "Not provided");
+
+    const termsAccepted = document.querySelector("#terms").checked;
+    addReviewItem("Terms accepted", termsAccepted ? "Yes" : "No");
+
+    // Edit buttons
+    ["Identity", "Security", "Profile"].forEach(function (title, index) {
+        const edit = document.createElement("button");
+
+        edit.type = "button";
+        edit.textContent = "Edit " + title;
+
+        edit.addEventListener("click", function () {
+            showStep(index);
+        });
+
+        review.appendChild(edit);
+    });
 }
 
 form.addEventListener("click", function (event) {
@@ -205,21 +324,43 @@ form.addEventListener("click", function (event) {
 });
 
 fields.forEach(function (field) {
-  field.addEventListener("blur", function () { checkField(field); });
-  field.addEventListener("input", function () {
-    status.textContent = "";
-    if (field.getAttribute("aria-invalid") === "true") checkField(field);
-   
-    // TODO: recheck confirmation if password changes after confirmation was entered.
+    field.addEventListener("blur", function () {
+        checkField(field);
+        updateErrorSummary();
+    });
 
-    if (field.id === "password") {
-        const confirmField = document.querySelector("#confirm");
+    field.addEventListener("input", function () {
+        status.textContent = "";
 
-        if (confirmField.value !== "") {
-            checkField(confirmField);
+        if (field.getAttribute("aria-invalid") === "true") {
+            checkField(field);
+            updateErrorSummary();
         }
-    }
-  });
+
+        if (field.id === "password") {
+            const confirmField = document.querySelector("#confirm");
+
+            if (confirmField.value !== "") {
+                checkField(confirmField);
+                updateErrorSummary();
+            }
+        }
+    });
+});
+
+fields.forEach(function (field) {
+    field.addEventListener("change", function () {
+        status.textContent = "";
+
+        if (
+            field.type === "radio" ||
+            field.type === "checkbox" ||
+            field.tagName === "SELECT"
+        ) {
+            checkField(field);
+            updateErrorSummary();
+        }
+    });
 });
 document.querySelector("#bio").addEventListener("input", function (event) {
   document.querySelector("#bioCount").textContent = 140 - event.target.value.length;
@@ -257,11 +398,22 @@ passwordInput.addEventListener("input", updatePasswordChecklist);
 updatePasswordChecklist();
 
 form.addEventListener("submit", function (event) {
-  event.preventDefault();
-  const invalid = fields.filter(function (field) { return !checkField(field); });
-  if (invalid.length) { showErrors(invalid); return; }
-  buildReview();
-  showStep(3);
-  status.textContent = "Implemented checks passed. Nothing sent. Complete all TODOs before submitting this project.";
+    event.preventDefault();
+
+    const invalid = fields.filter(function (field) {
+        return !checkField(field);
+    });
+
+    if (invalid.length) {
+        status.textContent = "";
+        showErrors(invalid);
+        return;
+    }
+
+    buildReview();
+    showStep(3);
+
+    status.textContent =
+        "Registration validation successful! This is a demonstration; no data was sent.";
 });
 showStep(0);
